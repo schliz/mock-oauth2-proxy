@@ -1,0 +1,38 @@
+package main
+
+import (
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+)
+
+func newAuthProxy(cfg *Config) http.Handler {
+	target, _ := url.Parse(cfg.Upstream)
+
+	proxy := &httputil.ReverseProxy{
+		Rewrite: func(r *httputil.ProxyRequest) {
+			r.SetURL(target)
+			r.SetXForwarded()
+
+			session, err := getSession(r.In, cfg)
+			if err != nil {
+				return
+			}
+
+			r.Out.Header.Set("X-Auth-Request-User", session.User)
+			r.Out.Header.Set("X-Auth-Request-Email", session.Email)
+			r.Out.Header.Set("X-Auth-Request-Groups", session.Groups)
+			r.Out.Header.Set("X-Auth-Request-Preferred-Username", session.PreferredUsername)
+		},
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := getSession(r, cfg)
+		if err != nil {
+			rd := r.URL.RequestURI()
+			http.Redirect(w, r, cfg.ProxyPrefix+"/sign_in?rd="+url.QueryEscape(rd), http.StatusFound)
+			return
+		}
+		proxy.ServeHTTP(w, r)
+	})
+}
