@@ -1,13 +1,17 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 )
 
 func newAuthProxy(cfg *Config) http.Handler {
-	target, _ := url.Parse(cfg.Upstream)
+	target, err := url.Parse(cfg.Upstream)
+	if err != nil {
+		log.Fatalf("invalid upstream URL %q: %v", cfg.Upstream, err)
+	}
 
 	proxy := &httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {

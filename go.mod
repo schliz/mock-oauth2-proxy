@@ -1,3 +1,3 @@
 module github.com/schliz/mock-oauth2-proxy
 
-go 1.24.7
+go 1.26.1

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -133,7 +134,7 @@ func handleStart(cfg *Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		target := cfg.ProxyPrefix + "/sign_in"
 		if rd := r.URL.Query().Get("rd"); rd != "" {
-			target += "?rd=" + rd
+			target += "?rd=" + url.QueryEscape(rd)
 		}
 		http.Redirect(w, r, target, http.StatusFound)
 	}
