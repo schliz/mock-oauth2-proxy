@@ -18,7 +18,7 @@ type UserProfile struct {
 	ID                string `json:"id"`
 	Email             string `json:"email"`
 	User              string `json:"user"`
-	Groups            string `json:"groups"`
+	Groups            []string `json:"groups"`
 	PreferredUsername  string `json:"preferred_username"`
 }
 

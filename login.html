@@ -31,7 +31,7 @@
 </head>
 <body>
 <div class="container">
-  <div class="banner">&#9888; Development Mode — No real authentication</div>
+  <div class="banner">&#9888; Development Mode — Mocked Authentication</div>
   <h1>Mock OAuth2 Proxy</h1>
   <p class="subtitle">Select a user to sign in</p>
 
@@ -39,7 +39,7 @@
   <form method="POST" action="{{$.Prefix}}/sign_in" class="user-card">
     <input type="hidden" name="email" value="{{.Email}}">
     <input type="hidden" name="user" value="{{.User}}">
-    <input type="hidden" name="groups" value="{{.Groups}}">
+    <input type="hidden" name="groups" value="{{join .Groups ","}}">
     <input type="hidden" name="preferred_username" value="{{.PreferredUsername}}">
     {{if $.Rd}}<input type="hidden" name="rd" value="{{$.Rd}}">{{end}}
     <button type="submit">
@@ -47,7 +47,7 @@
       <span class="info">
         <span class="name">{{.ID}}</span>
         <span class="email">{{.Email}}</span>
-        <span class="groups">Groups: {{if .Groups}}{{.Groups}}{{else}}&mdash;{{end}}</span>
+        <span class="groups">{{if .Groups}}Groups: {{join .Groups ", "}}{{else}}<i>No groups</i>{{end}}</span>
       </span>
     </button>
   </form>

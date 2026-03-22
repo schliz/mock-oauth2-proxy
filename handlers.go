@@ -13,7 +13,11 @@ import (
 //go:embed login.html
 var loginFS embed.FS
 
-var loginTmpl = template.Must(template.ParseFS(loginFS, "login.html"))
+var loginTmpl = template.Must(
+	template.New("login.html").Funcs(template.FuncMap{
+		"join": strings.Join,
+	}).ParseFS(loginFS, "login.html"),
+)
 
 type loginPageData struct {
 	Users  []UserProfile
@@ -57,10 +61,19 @@ func handleSignIn(cfg *Config) http.HandlerFunc {
 			preferredUsername = user
 		}
 
+		var groups []string
+		if raw := r.FormValue("groups"); raw != "" {
+			for _, g := range strings.Split(raw, ",") {
+				if g = strings.TrimSpace(g); g != "" {
+					groups = append(groups, g)
+				}
+			}
+		}
+
 		session := &Session{
 			User:              user,
 			Email:             email,
-			Groups:            r.FormValue("groups"),
+			Groups:            groups,
 			PreferredUsername:  preferredUsername,
 		}
 
@@ -96,7 +109,7 @@ func handleAuth(cfg *Config) http.HandlerFunc {
 		}
 		w.Header().Set("X-Auth-Request-User", session.User)
 		w.Header().Set("X-Auth-Request-Email", session.Email)
-		w.Header().Set("X-Auth-Request-Groups", session.Groups)
+		w.Header().Set("X-Auth-Request-Groups", strings.Join(session.Groups, ","))
 		w.Header().Set("X-Auth-Request-Preferred-Username", session.PreferredUsername)
 		w.WriteHeader(http.StatusAccepted)
 	}
@@ -110,7 +123,7 @@ func handleUserInfo(cfg *Config) http.HandlerFunc {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		json.NewEncoder(w).Encode(map[string]any{
 			"email":             session.Email,
 			"user":              session.User,
 			"groups":            session.Groups,

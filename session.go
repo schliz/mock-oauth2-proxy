@@ -16,7 +16,7 @@ import (
 type Session struct {
 	User              string `json:"user"`
 	Email             string `json:"email"`
-	Groups            string `json:"groups"`
+	Groups            []string `json:"groups"`
 	PreferredUsername  string `json:"preferred_username"`
 	ExpiresAt         int64  `json:"exp"`
 }

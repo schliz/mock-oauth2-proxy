@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 func newAuthProxy(cfg *Config) http.Handler {
@@ -25,7 +26,7 @@ func newAuthProxy(cfg *Config) http.Handler {
 
 			r.Out.Header.Set("X-Auth-Request-User", session.User)
 			r.Out.Header.Set("X-Auth-Request-Email", session.Email)
-			r.Out.Header.Set("X-Auth-Request-Groups", session.Groups)
+			r.Out.Header.Set("X-Auth-Request-Groups", strings.Join(session.Groups, ","))
 			r.Out.Header.Set("X-Auth-Request-Preferred-Username", session.PreferredUsername)
 		},
 	}
