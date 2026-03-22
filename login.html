@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock OAuth2 Proxy — Login</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; margin: 0; padding: 2rem 1rem; color: #333; }
+  .container { max-width: 480px; margin: 0 auto; }
+  .banner { background: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 0.75rem 1rem; border-radius: 6px; text-align: center; margin-bottom: 1.5rem; font-weight: 600; }
+  h1 { text-align: center; margin: 0 0 0.25rem; font-size: 1.5rem; }
+  .subtitle { text-align: center; color: #666; margin: 0 0 1.5rem; }
+  .user-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 0.75rem; overflow: hidden; }
+  .user-card button { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 1rem; background: none; border: none; cursor: pointer; text-align: left; font-size: 0.95rem; transition: background 0.15s; }
+  .user-card button:hover { background: #f0f7ff; }
+  .user-card .icon { font-size: 1.3rem; flex-shrink: 0; }
+  .user-card .info { flex: 1; min-width: 0; }
+  .user-card .name { font-weight: 600; display: block; }
+  .user-card .email { color: #666; font-size: 0.85rem; display: block; }
+  .user-card .groups { color: #999; font-size: 0.8rem; display: block; margin-top: 2px; }
+  details { background: #fff; border: 1px solid #ddd; border-radius: 8px; margin-top: 1rem; }
+  summary { padding: 1rem; cursor: pointer; font-weight: 600; user-select: none; }
+  summary:hover { background: #fafafa; }
+  .custom-form { padding: 0 1rem 1rem; }
+  .custom-form label { display: block; font-size: 0.85rem; font-weight: 500; margin-top: 0.75rem; margin-bottom: 0.25rem; }
+  .custom-form input { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
+  .custom-form button { margin-top: 1rem; width: 100%; padding: 0.6rem; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+  .custom-form button:hover { background: #1d4ed8; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="banner">&#9888; Development Mode — No real authentication</div>
+  <h1>Mock OAuth2 Proxy</h1>
+  <p class="subtitle">Select a user to sign in</p>
+
+  {{range .Users}}
+  <form method="POST" action="{{$.Prefix}}/sign_in" class="user-card">
+    <input type="hidden" name="email" value="{{.Email}}">
+    <input type="hidden" name="user" value="{{.User}}">
+    <input type="hidden" name="groups" value="{{.Groups}}">
+    <input type="hidden" name="preferred_username" value="{{.PreferredUsername}}">
+    {{if $.Rd}}<input type="hidden" name="rd" value="{{$.Rd}}">{{end}}
+    <button type="submit">
+      <span class="icon">&#128273;</span>
+      <span class="info">
+        <span class="name">{{.ID}}</span>
+        <span class="email">{{.Email}}</span>
+        <span class="groups">Groups: {{if .Groups}}{{.Groups}}{{else}}&mdash;{{end}}</span>
+      </span>
+    </button>
+  </form>
+  {{end}}
+
+  <details>
+    <summary>Custom Login&hellip;</summary>
+    <form method="POST" action="{{.Prefix}}/sign_in" class="custom-form">
+      {{if .Rd}}<input type="hidden" name="rd" value="{{.Rd}}">{{end}}
+      <label for="cf-email">Email</label>
+      <input id="cf-email" name="email" type="email" required placeholder="user@example.com">
+      <label for="cf-user">User</label>
+      <input id="cf-user" name="user" placeholder="(defaults to email)">
+      <label for="cf-groups">Groups</label>
+      <input id="cf-groups" name="groups" placeholder="group1,group2">
+      <label for="cf-pref">Preferred Username</label>
+      <input id="cf-pref" name="preferred_username" placeholder="(defaults to user)">
+      <button type="submit">Login</button>
+    </form>
+  </details>
+</div>
+</body>
+</html>
